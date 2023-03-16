@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from 'openai'
+import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai'
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -15,11 +15,11 @@ export default async function (req, res) {
     return
   }
 
-  const seken = req.body.animal || ''
+  const seken = req.body.dazai || ''
   if (seken.trim().length === 0) {
     res.status(400).json({
       error: {
-        message: 'Please enter a valid animal',
+        message: '太宰メソッドで入力してください。',
       },
     })
     return
@@ -47,7 +47,7 @@ export default async function (req, res) {
   }
 }
 
-const generateMessages = (seken) => [
+const generateMessages = (seken): ChatCompletionRequestMessage[] => [
   {
     role: 'system',
     content: `
