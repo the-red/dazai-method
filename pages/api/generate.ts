@@ -1,11 +1,13 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai'
+import type { AxiosError } from 'axios'
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 })
 const openai = new OpenAIApi(configuration)
 
-export default async function (req, res) {
+export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (!configuration.apiKey) {
     res.status(500).json({
       error: {
@@ -30,8 +32,9 @@ export default async function (req, res) {
       model: 'gpt-3.5-turbo',
       messages: generateMessages(seken),
     })
-    res.status(200).json({ result: completion.data.choices[0].message.content })
-  } catch (error) {
+    res.status(200).json({ result: completion?.data?.choices?.[0]?.message?.content })
+  } catch (e) {
+    const error = e as AxiosError
     // Consider adjusting the error handling logic for your use case
     if (error.response) {
       console.error(error.response.status, error.response.data)
@@ -47,7 +50,7 @@ export default async function (req, res) {
   }
 }
 
-const generateMessages = (seken): ChatCompletionRequestMessage[] => [
+const generateMessages = (seken: string): ChatCompletionRequestMessage[] => [
   {
     role: 'system',
     content: `

@@ -1,14 +1,14 @@
 import Head from 'next/head'
 import link from 'next/link'
 import { type } from 'os'
-import { useState } from 'react'
+import { FormEventHandler, useState } from 'react'
 import styles from './index.module.css'
 
 export default function Home() {
   const [dazailInput, setDazaiInput] = useState('')
   const [result, setResult] = useState()
 
-  async function onSubmit(event) {
+  const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault()
     try {
       const response = await fetch('/api/generate', {
@@ -26,7 +26,8 @@ export default function Home() {
 
       setResult(data.result)
       setDazaiInput('')
-    } catch (error) {
+    } catch (e) {
+      const error = e as Error
       // Consider implementing your own error handling logic here
       console.error(error)
       alert(error.message)
