@@ -3,14 +3,16 @@ import link from 'next/link'
 import { type } from 'os'
 import { FormEventHandler, useState } from 'react'
 import styles from './index.module.css'
+import { BeatLoader } from 'react-spinners'
 
 export default function Home() {
   const [dazailInput, setDazaiInput] = useState('')
   const [result, setResult] = useState()
-
+  const [loading, setLoading] = useState(false)
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault()
     try {
+      setLoading(true)
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -31,6 +33,8 @@ export default function Home() {
       // Consider implementing your own error handling logic here
       console.error(error)
       alert(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -52,7 +56,17 @@ export default function Home() {
             value={dazailInput}
             onChange={(e) => setDazaiInput(e.target.value)}
           />
-          <input type="submit" value="返答する" />
+          {loading ? (
+            <BeatLoader
+              color="#10a37f"
+              cssOverride={{
+                justifyContent: 'center',
+              }}
+              size={20}
+            />
+          ) : (
+            <input type="submit" value="返答する" />
+          )}
         </form>
         <div className={styles.result}>{result}</div>
       </main>
