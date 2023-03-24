@@ -1,11 +1,12 @@
 import Head from 'next/head'
 import link from 'next/link'
 import { type } from 'os'
-import { FormEventHandler, useState } from 'react'
+import { FormEventHandler, useRef, useState } from 'react'
 import styles from './index.module.css'
 import { BeatLoader } from 'react-spinners'
 
 export default function Home() {
+  const inputElement = useRef<HTMLInputElement>(null)
   const [dazailInput, setDazaiInput] = useState('')
   const [result, setResult] = useState<string>('')
   const [error, setError] = useState<string>('')
@@ -13,6 +14,7 @@ export default function Home() {
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault()
     try {
+      inputElement.current?.select()
       setResult('')
       setError('')
       setLoading(true)
@@ -52,6 +54,7 @@ export default function Home() {
         <h3>太宰メソッド</h3>
         <form onSubmit={onSubmit}>
           <input
+            ref={inputElement}
             type="text"
             name="dazai"
             placeholder="世間がどうしたのですか？"
