@@ -60,7 +60,11 @@
   text-align: center;
   cursor: pointer;
 }
-.main .result {
+.main .result,
+.main .error {
   font-weight: bold;
-  margin-top: 40px;
+  margin-top: 20px;
+}
+.main .error {
+  color: crimson;
 }

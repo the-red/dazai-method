@@ -21,7 +21,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (seken.trim().length === 0) {
     res.status(400).json({
       error: {
-        message: '太宰メソッドで入力してください。',
+        message: '入力内容が正しくありません。',
       },
     })
     return

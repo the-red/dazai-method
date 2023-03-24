@@ -7,11 +7,14 @@ import { BeatLoader } from 'react-spinners'
 
 export default function Home() {
   const [dazailInput, setDazaiInput] = useState('')
-  const [result, setResult] = useState()
+  const [result, setResult] = useState<string>('')
+  const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault()
     try {
+      setResult('')
+      setError('')
       setLoading(true)
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -21,18 +24,17 @@ export default function Home() {
         body: JSON.stringify({ dazai: dazailInput }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as { result: string; error?: Error }
       if (response.status !== 200) {
         throw data.error || new Error(`Request failed with status ${response.status}`)
       }
 
       setResult(data.result)
-      setDazaiInput('')
     } catch (e) {
       const error = e as Error
       // Consider implementing your own error handling logic here
       console.error(error)
-      alert(error.message)
+      setError(error.message)
     } finally {
       setLoading(false)
     }
@@ -56,7 +58,7 @@ export default function Home() {
             value={dazailInput}
             onChange={(e) => setDazaiInput(e.target.value)}
           />
-          {loading ? (
+          {loading && (
             <BeatLoader
               color="#10a37f"
               cssOverride={{
@@ -64,11 +66,9 @@ export default function Home() {
               }}
               size={20}
             />
-          ) : (
-            <input type="submit" value="返答する" />
           )}
         </form>
-        <div className={styles.result}>{result}</div>
+        {error ? <div className={styles.error}>{error}</div> : <div className={styles.result}>{result}</div>}
       </main>
     </div>
   )
