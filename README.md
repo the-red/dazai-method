@@ -1,5 +1,12 @@
 # OpenAI 太宰メソッド
 
+## 運用環境
+### Webアプリ（Next.js）
+https://dazai-method-ncjzc52vwa-an.a.run.app/
+
+### LINEチャットボット
+https://liff.line.me/1645278921-kWRPP32q/?accountId=020qdybb
+
 ## Setup
 
 1. If you don’t have Node.js installed, [install it from here](https://nodejs.org/en/)
