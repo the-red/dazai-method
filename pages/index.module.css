@@ -35,11 +35,6 @@
   color: #202123;
   margin: 16px 0 40px;
 }
-.main form {
-  display: flex;
-  flex-direction: column;
-  width: 320px;
-}
 .main input[type='text'] {
   padding: 12px 16px;
   border: 1px solid #10a37f;
@@ -67,4 +62,22 @@
 }
 .main .error {
   color: crimson;
+}
+
+/* スマホ用 */
+@media all and (max-width: 767.98px) {
+  .main form {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+  }
+}
+
+/* PC用 */
+@media all and (min-width: 768px) {
+  .main form {
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+  }
 }
