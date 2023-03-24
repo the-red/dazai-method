@@ -38,11 +38,11 @@ export default function Home() {
     <div>
       <Head>
         <title>太宰メソッド</title>
-        <link rel="icon" href="/dog.png" />
+        <link rel="icon" href="/seken.png" />
       </Head>
 
       <main className={styles.main}>
-        <img src="/dog.png" className={styles.icon} />
+        <img src="/dazai.png" className={styles.icon} />
         <h3>太宰メソッド</h3>
         <form onSubmit={onSubmit}>
           <input
