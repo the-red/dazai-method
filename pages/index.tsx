@@ -73,6 +73,18 @@ export default function Home() {
         </form>
         {error ? <div className={styles.error}>{error}</div> : <div className={styles.result}>{result}</div>}
       </main>
+
+      <footer className={styles.footer}>
+        <p>
+          <a
+            href="https://d.hatena.ne.jp/keyword/%E5%A4%AA%E5%AE%B0%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89"
+            target="_blank"
+            rel="noreferrer"
+          >
+            What is 太宰メソッド？
+          </a>
+        </p>
+      </footer>
     </div>
   )
 }
