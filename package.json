@@ -1,6 +1,5 @@
 {
-  "name": "openai-quickstart-node",
-  "version": "0.1.0",
+  "name": "dazai-method",
   "private": true,
   "scripts": {
     "dev": "next dev",
