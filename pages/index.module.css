@@ -19,8 +19,7 @@
   color: #353740;
   font-family: 'ColfaxAI', Helvetica, sans-serif;
 }
-.main,
-.footer {
+.main {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -63,6 +62,12 @@
 }
 .main .error {
   color: crimson;
+}
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
 }
 
 /* スマホ用 */
