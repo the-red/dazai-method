@@ -2,7 +2,7 @@
 
 ## 運用環境
 ### Webアプリ（Next.js）
-https://dazai-method-ncjzc52vwa-an.a.run.app/
+https://dazai-method.vercel.app/
 
 ### LINEチャットボット
 https://liff.line.me/1645278921-kWRPP32q/?accountId=020qdybb
