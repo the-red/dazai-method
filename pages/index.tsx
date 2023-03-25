@@ -1,6 +1,4 @@
 import Head from 'next/head'
-import link from 'next/link'
-import { type } from 'os'
 import { FormEventHandler, useRef, useState } from 'react'
 import styles from './index.module.css'
 import { BeatLoader } from 'react-spinners'
