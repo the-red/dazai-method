@@ -5,6 +5,19 @@ import { FormEventHandler, useRef, useState } from 'react'
 import styles from './index.module.css'
 import { BeatLoader } from 'react-spinners'
 
+const Ads = () => (
+  <>
+    <a href="https://px.a8.net/svt/ejp?a8mat=3T4O7I+GE0M1M+407E+5ZEMP" rel="nofollow">
+      <img
+        width="320"
+        height="50"
+        alt=""
+        src="https://www28.a8.net/svt/bgt?aid=230325390991&wid=002&eno=01&mid=s00000018689001005000&mc=1"
+      />
+    </a>
+  </>
+)
+
 export default function Home() {
   const inputElement = useRef<HTMLInputElement>(null)
   const [dazailInput, setDazaiInput] = useState('')
@@ -84,6 +97,7 @@ export default function Home() {
             What is 太宰メソッド？
           </a>
         </p>
+        <Ads />
       </footer>
     </div>
   )
