@@ -5,14 +5,15 @@ import { BeatLoader } from 'react-spinners'
 
 const Ads = () => (
   <>
-    <a href="https://px.a8.net/svt/ejp?a8mat=3T4O7I+GE0M1M+407E+5ZEMP" rel="nofollow noopener" target="_blank">
+    <a href="https://px.a8.net/svt/ejp?a8mat=3T4O7H+N7XDE+CO4+15XK4X" rel="nofollow noopener" target="_blank">
       <img
-        width="320"
-        height="50"
+        width="234"
+        height="60"
         alt=""
-        src="https://www28.a8.net/svt/bgt?aid=230325390991&wid=002&eno=01&mid=s00000018689001005000&mc=1"
+        src="https://www25.a8.net/svt/bgt?aid=230325389039&wid=001&eno=01&mid=s00000001642007043000&mc=1"
       />
     </a>
+    <img width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=3T4O7H+N7XDE+CO4+15XK4X" alt="" />
   </>
 )
 
