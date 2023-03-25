@@ -7,7 +7,7 @@ import { BeatLoader } from 'react-spinners'
 
 const Ads = () => (
   <>
-    <a href="https://px.a8.net/svt/ejp?a8mat=3T4O7I+GE0M1M+407E+5ZEMP" rel="nofollow">
+    <a href="https://px.a8.net/svt/ejp?a8mat=3T4O7I+GE0M1M+407E+5ZEMP" rel="nofollow noopener" target="_blank">
       <img
         width="320"
         height="50"
