@@ -59,6 +59,7 @@ export default function Home() {
       <Head>
         <title>太宰メソッド</title>
         <link rel="icon" href="/seken.png" />
+        <script async src="https://platform.twitter.com/widgets.js"></script>
       </Head>
 
       <main className={styles.main}>
@@ -85,6 +86,16 @@ export default function Home() {
           )}
         </form>
         {error ? <div className={styles.error}>{error}</div> : <div className={styles.result}>{result}</div>}
+        <a
+          href="https://twitter.com/share?ref_src=twsrc%5Etfw"
+          className="twitter-share-button"
+          data-text={result}
+          data-size="large"
+          data-hashtags="太宰メソッド"
+          data-show-count="false"
+        >
+          Tweet
+        </a>
       </main>
 
       <footer className={styles.footer}>
