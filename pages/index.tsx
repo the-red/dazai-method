@@ -72,6 +72,7 @@ export default function Home() {
             placeholder="世間がどうしたのですか？"
             value={dazailInput}
             onChange={(e) => setDazaiInput(e.target.value)}
+            enterKeyHint="send"
           />
           {loading && (
             <BeatLoader
