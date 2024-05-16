@@ -1,14 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai'
-import type { AxiosError } from 'axios'
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-const openai = new OpenAIApi(configuration)
+import OpenAI from 'openai'
+import { APIError } from 'openai/error'
+import { ChatCompletionMessageParam } from 'openai/resources'
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  if (!configuration.apiKey) {
+  if (!process.env.OPENAI_API_KEY) {
     res.status(500).json({
       error: {
         message: 'OpenAI API key not configured, please follow instructions in README.md',
@@ -16,6 +12,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     })
     return
   }
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
   const seken = req.body.dazai || ''
   if (seken.trim().length === 0) {
@@ -28,29 +25,24 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
       messages: generateMessages(seken),
     })
-    res.status(200).json({ result: completion?.data?.choices?.[0]?.message?.content })
+    res.status(200).json({ result: completion?.choices?.[0]?.message?.content })
   } catch (e) {
-    const error = e as AxiosError
-    // Consider adjusting the error handling logic for your use case
-    if (error.response) {
-      console.error(error.response.status, error.response.data)
-      res.status(error.response.status).json(error.response.data)
-    } else {
-      console.error(`Error with OpenAI API request: ${error.message}`)
-      res.status(500).json({
-        error: {
-          message: 'An error occurred during your request.',
-        },
-      })
-    }
+    const error = e as APIError
+    console.error(error)
+    console.error(`Error with OpenAI API request: ${error.message}`)
+    res.status(500).json({
+      error: {
+        message: 'An error occurred during your request.',
+      },
+    })
   }
 }
 
-const generateMessages = (seken: string): ChatCompletionRequestMessage[] => [
+const generateMessages = (seken: string): ChatCompletionMessageParam[] => [
   {
     role: 'system',
     content: `
