@@ -26,7 +26,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-6-luna',
       messages: generateMessages(seken),
     })
     res.status(200).json({ result: completion?.choices?.[0]?.message?.content })

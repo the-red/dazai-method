@@ -42,7 +42,7 @@ const generateReplyText = (userMessage) => {
       'Authorization': 'Bearer ' + OPENAI_APIKEY,
     },
     payload: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-6-luna',
       messages: generateMessages(userMessage),
     }),
   }
