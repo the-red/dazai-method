@@ -15,7 +15,7 @@
     "react-spinners": "^0.13.8"
   },
   "engines": {
-    "node": ">=14.6.0"
+    "node": "24.x"
   },
   "devDependencies": {
     "@types/node": "18.15.3",
