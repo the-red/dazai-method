@@ -63,14 +63,16 @@ Vercel の環境変数に `OPENAI_API_KEY`, `LINE_CHANNEL_SECRET`, `LINE_CHANNEL
 
 ## アクセス解析（Google Analytics / Search Console）
 
-### Google Analytics 4
+### Google タグマネージャー（GTM）経由の Google Analytics 4
 
-`pages/_app.tsx` で `@next/third-parties/google` の `GoogleAnalytics` を読み込んでいる。
-測定 ID は環境変数 `NEXT_PUBLIC_GA_MEASUREMENT_ID` から取り、未設定なら何も埋め込まない。
+`pages/_app.tsx` で `@next/third-parties/google` の `GoogleTagManager` を読み込んでいる。
+コンテナ ID は環境変数 `NEXT_PUBLIC_GTM_ID` から取り、未設定なら何も埋め込まない。
+GA4 の計測タグはコードではなく GTM 側で設定するので、GA の測定 ID をリポジトリや Vercel に持つ必要はない。
 
-1. GA 管理画面 > データストリーム > 該当ストリーム から測定 ID（`G-XXXXXXXXXX`）を控える
-2. Vercel のプロジェクト設定 > Environment Variables に `NEXT_PUBLIC_GA_MEASUREMENT_ID` を追加する（Production のみでよい）
-3. 再デプロイすると計測が始まる
+1. GTM でコンテナを作り、右上に表示されるコンテナ ID（`GTM-XXXXXXX`）を控える
+2. GTM で「Google タグ」を追加し、タグ ID に GA4 の測定 ID（`G-XXXXXXXXXX`）を入れ、トリガーを「All Pages（Initialization）」にして公開する
+3. Vercel のプロジェクト設定 > Environment Variables に `NEXT_PUBLIC_GTM_ID` を追加する（Production のみでよい）
+4. 再デプロイすると計測が始まる。GA4 の「リアルタイム」レポートで自分のアクセスが見えれば OK
 
 ### Google Search Console
 

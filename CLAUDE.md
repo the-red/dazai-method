@@ -45,8 +45,8 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
 - `pages/api/line.ts` — LINE Webhook。`@line/bot-sdk` の `validateSignature` で `X-Line-Signature` を検証し、
   不正なリクエストは 401 で拒否する。署名検証に生ボディが必要なため `bodyParser: false`。
   1 回の Webhook に含まれる全イベントを処理し、テキスト以外のメッセージには定型文、OpenAI 失敗時はフォールバック文を返す。
-- `pages/_app.tsx` — 全ページ共通のラッパー。環境変数 `NEXT_PUBLIC_GA_MEASUREMENT_ID` があるときだけ
-  `@next/third-parties/google` の `GoogleAnalytics` を埋め込む。
+- `pages/_app.tsx` — 全ページ共通のラッパー。環境変数 `NEXT_PUBLIC_GTM_ID` があるときだけ
+  `@next/third-parties/google` の `GoogleTagManager` を埋め込む。GA4 の計測タグは GTM 側で設定している。
 - `pages/index.module.css` — スタイルは CSS Modules のみ。
 
 ### 静的ファイル（`public/`）
@@ -57,7 +57,7 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
 ### 運用上の前提
 
 - Vercel の環境変数に `OPENAI_API_KEY`, `LINE_CHANNEL_SECRET`, `LINE_CHANNEL_ACCESS_TOKEN`,
-  `NEXT_PUBLIC_GA_MEASUREMENT_ID`（GA4 測定 ID）を設定している。
+  `NEXT_PUBLIC_GTM_ID`（GTM コンテナ ID）を設定している。GA4 の測定 ID は GTM 内にあり、コードには登場しない。
 - Google Search Console は `https://dazai-method.vercel.app/` を URL プレフィックスで登録し、HTML ファイル方式で所有権確認している。
 - LINE Developers コンソールの Webhook URL は `https://dazai-method.vercel.app/api/line`。
 - 2026-10 まで LINE Webhook は Google Apps Script で動いていたが、署名検証ができないため Vercel に移行し、GAS 実装は削除済み。
