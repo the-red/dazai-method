@@ -1,16 +1,32 @@
 import Head from 'next/head'
-import { FormEventHandler, useRef, useState } from 'react'
+import { FormEventHandler, useEffect, useRef, useState } from 'react'
 import styles from './index.module.css'
 import { BeatLoader } from 'react-spinners'
 
+// 入力欄のプレースホルダー候補（表示のたびにランダムで 1 つ選ぶ）
+const PLACEHOLDERS = [
+  'それは世間が、ゆるさない',
+  'そんな事をすると、世間からひどいめに逢うぞ',
+  'いまに世間から葬られる',
+]
+
 export default function Home() {
   const inputElement = useRef<HTMLInputElement>(null)
+  // サーバー側の HTML とブラウザ側の初回描画を一致させるため、乱数はマウント後に引く
+  const [placeholder, setPlaceholder] = useState('')
+  useEffect(() => {
+    setPlaceholder(PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)])
+  }, [])
   const [dazailInput, setDazaiInput] = useState('')
   const [result, setResult] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault()
+    // 空欄のまま送信されたら、表示中のプレースホルダーの文を入力とみなす
+    const dazai = dazailInput.trim() === '' ? placeholder : dazailInput
+    if (dazai === '') return
+    setDazaiInput(dazai)
     try {
       inputElement.current?.select()
       setResult('')
@@ -21,7 +37,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ dazai: dazailInput }),
+        body: JSON.stringify({ dazai }),
       })
 
       const data = (await response.json()) as { result: string; error?: Error }
@@ -68,7 +84,7 @@ export default function Home() {
             ref={inputElement}
             type="text"
             name="dazai"
-            placeholder="世間がどうしたのですか？"
+            placeholder={placeholder}
             value={dazailInput}
             onChange={(e) => setDazaiInput(e.target.value)}
             enterKeyHint="send"
