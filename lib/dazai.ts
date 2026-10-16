@@ -46,8 +46,8 @@ export const generateMessages = (seken: string): ChatCompletionMessageParam[] =>
   { role: 'user', content: seken },
 ]
 
-// OpenAI に問い合わせて主人公の返答を得る。失敗時は例外を投げる
-export const generateReply = async (seken: string): Promise<string> => {
+// 太宰メソッドの判定と切り返しを行うコア関数。OpenAI に問い合わせて主人公の返答を得る。失敗時は例外を投げる
+export const 太宰 = async (seken: string): Promise<string> => {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const completion = await openai.chat.completions.create({
     model: MODEL,

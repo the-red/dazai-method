@@ -32,14 +32,15 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
 
 ### 共通モジュール（`lib/dazai.ts`）
 
-- システムプロンプト（`generateMessages`）、使用モデル（`MODEL`）、OpenAI 呼び出し（`generateReply`）をここに一元化。
+- システムプロンプト（`generateMessages`）、使用モデル（`MODEL`）、OpenAI 呼び出し（`太宰`）をここに一元化。
+  コア関数は太宰メソッドにちなんで `太宰()` と命名している（意図的な日本語識別子。英語に戻さない）。
   Web と LINE の両方がこのモジュールを使うので、プロンプトやモデルの変更はこのファイルだけで済む。
 
 ### Next.js 側（`pages/`）
 
 - `pages/index.tsx` — 単一ページの UI。入力フォームから `/api/generate` に `{ dazai: string }` を POST し、
   `{ result }` または `{ error: { message } }` を受け取って表示する。
-- `pages/api/generate.ts` — Web 用 API Route。入力を検証して `generateReply` を呼ぶ。
+- `pages/api/generate.ts` — Web 用 API Route。入力を検証して `太宰` を呼ぶ。
 - `pages/api/line.ts` — LINE Webhook。`@line/bot-sdk` の `validateSignature` で `X-Line-Signature` を検証し、
   不正なリクエストは 401 で拒否する。署名検証に生ボディが必要なため `bodyParser: false`。
   1 回の Webhook に含まれる全イベントを処理し、テキスト以外のメッセージには定型文、OpenAI 失敗時はフォールバック文を返す。

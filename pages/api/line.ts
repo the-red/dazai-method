@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { messagingApi, validateSignature, webhook } from '@line/bot-sdk'
-import { NOT_DAZAI_METHOD, generateReply } from '../../lib/dazai'
+import { NOT_DAZAI_METHOD, 太宰 } from '../../lib/dazai'
 
 // LINE Messaging API の Webhook エンドポイント
 // 署名検証のため生のリクエストボディが必要なので、Next.js の JSON パースを無効化する
@@ -47,7 +47,7 @@ const buildReplyText = async (message: webhook.MessageContent): Promise<string> 
     return NOT_DAZAI_METHOD
   }
   try {
-    return await generateReply(message.text)
+    return await 太宰(message.text)
   } catch (e) {
     console.error('Error with OpenAI API request:', e)
     return FALLBACK_REPLY
