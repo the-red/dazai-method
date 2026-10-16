@@ -46,16 +46,18 @@ export const generateMessages = (seken: string): ChatCompletionMessageParam[] =>
   { role: 'user', content: seken },
 ]
 
-// 太宰メソッドの判定と切り返しを行うコア関数。OpenAI に問い合わせて主人公の返答を得る。失敗時は例外を投げる
-export const 太宰 = async (seken: string): Promise<string> => {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  const completion = await openai.chat.completions.create({
-    model: MODEL,
-    messages: generateMessages(seken),
-  })
-  const text = completion.choices[0]?.message?.content?.trim()
-  if (!text) {
-    throw new Error('OpenAI returned an empty response')
-  }
-  return text
+export default {
+  // 太宰メソッド。発言を受け取り、OpenAI に問い合わせて『人間失格』の主人公の返答を得る。失敗時は例外を投げる
+  async 太宰(seken: string): Promise<string> {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const completion = await openai.chat.completions.create({
+      model: MODEL,
+      messages: generateMessages(seken),
+    })
+    const text = completion.choices[0]?.message?.content?.trim()
+    if (!text) {
+      throw new Error('OpenAI returned an empty response')
+    }
+    return text
+  },
 }

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { 太宰 } from '../../lib/dazai'
+import dazai from '../../lib/dazai'
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (!process.env.OPENAI_API_KEY) {
@@ -22,7 +22,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const result = await 太宰(seken)
+    const result = await dazai.太宰(seken)
     res.status(200).json({ result })
   } catch (e) {
     const error = e as Error
