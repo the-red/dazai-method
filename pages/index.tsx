@@ -77,8 +77,7 @@ export default function Home() {
       </a>
 
       <main className={styles.main}>
-        <img src="/dazai.png" className={styles.icon} />
-        <h3>太宰メソッド</h3>
+        <img src="/dazai.webp" alt="太宰メソッド" className={styles.hero} />
         <form onSubmit={onSubmit}>
           <input
             ref={inputElement}
