@@ -94,3 +94,11 @@ test('未知のパスは 404', async () => {
     expect(res.status).toBe(404)
   }
 })
+
+test('1MiB を超えるボディは 413', async () => {
+  const text = 'a'.repeat(1024 * 1024)
+  const res = await app.request('/api/decode', post({ text }), ENV)
+  expect(res.status).toBe(413)
+  expect(await res.json()).toEqual({ error: { message: '入力が長すぎます。' } })
+  expect(decodeMock).not.toHaveBeenCalled()
+})
