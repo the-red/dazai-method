@@ -10,7 +10,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Web アプリ**: Next.js（Pages Router）。Vercel にデプロイ（https://dazai-method.vercel.app/）
 - **LINE チャットボット**: 同じ Next.js の API Route（`pages/api/line.ts`）が LINE Messaging API の Webhook として動作
-  - 旧実装は Google Apps Script（`gas/code.js`）。Vercel 側への切り替え確認が済むまで残している（Backlog THE_RED-16）
 
 ## コマンド
 
@@ -46,14 +45,12 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
   1 回の Webhook に含まれる全イベントを処理し、テキスト以外のメッセージには定型文、OpenAI 失敗時はフォールバック文を返す。
 - `pages/index.module.css` — スタイルは CSS Modules のみ。
 
-### GAS 側（`gas/code.js`、旧実装）
+### 運用上の前提
 
-- Next.js のビルド対象外。Apps Script エディタに手動でコピーしてデプロイしていた独立したスクリプト。
-- `doPost` はリクエストヘッダーを読めないため署名検証ができない。これが Vercel へ移行した主な理由。
-- Vercel 側への Webhook URL 切り替えと動作確認が済んだら、GAS のデプロイを無効化してこのディレクトリを削除する。
-  それまでプロンプトの変更は `lib/dazai.ts` のみに行い、`gas/code.js` は更新しない。
+- Vercel の環境変数に `OPENAI_API_KEY`, `LINE_CHANNEL_SECRET`, `LINE_CHANNEL_ACCESS_TOKEN` を設定している。
+- LINE Developers コンソールの Webhook URL は `https://dazai-method.vercel.app/api/line`。
+- 2026-10 まで LINE Webhook は Google Apps Script で動いていたが、署名検証ができないため Vercel に移行し、GAS 実装は削除済み。
 
 ## コードスタイル
 
 Prettier 設定（`.prettierrc.yaml`）: セミコロンなし、シングルクォート、printWidth 120。
-`gas/code.js` は `yarn format` の対象外（削除予定のため原則編集しない）。
