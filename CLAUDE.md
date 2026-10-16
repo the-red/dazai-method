@@ -8,7 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 『人間失格』の主人公として「世間じゃない。あなたが〜でしょう？」と切り返す OpenAI チャットボット。
 同じプロンプトで 2 つの配信形態がある。
 
-- **Web アプリ**: Next.js（Pages Router）。Vercel にデプロイ（https://dazai-method.vercel.app/）
+- **Web アプリ**: Next.js（Pages Router）。Vercel にデプロイ（https://dazai-method.vercel.app/）。
+  「世間じゃない」（太宰メソッドに切り返す）と「世間に託す」（本音を太宰メソッドに変換する）の 2 モード
 - **LINE チャットボット**: 同じ Next.js の API Route（`pages/api/line.ts`）が LINE Messaging API の Webhook として動作
 
 ## コマンド
@@ -37,7 +38,8 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
   Web と LINE の両方がこのクラスを使うので、プロンプトやモデルや文言の変更はこのファイルだけで済む。
 - **`太宰` クラスが提供するメソッドを総称して「太宰メソッド」と呼ぶ。** 「太宰メソッド」の名にちなんだ意図的な設計で、
   クラス名は日本語のまま、namespace や単なるオブジェクトや関数にはしない（英語化・関数化・namespace 化しない）。
-  現在のメソッド: `切り返す(発言)`（LLM 呼び出し、主人公の切り返しを返す）、`聞き流す()`（太宰メソッドでないときの定型文）、
+  現在のメソッド: `切り返す(発言)`（LLM 呼び出し、主人公の切り返しを返す）、`世間に託す(本音)`（LLM 呼び出し、本音を太宰メソッドの言い方に変換する）、
+  `聞き流す()`（太宰メソッドでないときの定型文）、
   `道化る()`（テキスト以外を受けたときの定型文）、`恥じる()`（LLM 失敗時のフォールバック文）、`例を挙げる()`（プロンプト内の例文）。
 - 人格（ロールプレイする人物）、モデル、OpenAI クライアントはコンストラクタの省略可能オプションで差し替えられる。
   生成後に変えられる setter は意図的に設けない（共有インスタンスの振る舞いが途中で変わるのを防ぐ）。
@@ -46,9 +48,11 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
 
 ### Next.js 側（`pages/`）
 
-- `pages/index.tsx` — 単一ページの UI。入力フォームから `/api/generate` に `{ dazai: string }` を POST し、
-  `{ result }` または `{ error: { message } }` を受け取って表示する。
-- `pages/api/generate.ts` — Web 用 API Route。入力を検証して `dazai.太宰()` を呼ぶ。
+- `pages/index.tsx` — 単一ページの UI。モード切り替え（decode / encode）に応じて `/api/decode` または `/api/encode` に
+  `{ text: string }` を POST し、`{ result }` または `{ error: { message } }` を受け取って表示する。
+- `pages/api/decode.ts` / `pages/api/encode.ts` — Web 用 API Route。それぞれ `切り返す()` / `世間に託す()` を 1 対 1 で公開する。
+  太宰メソッドを「本音を世間語にエンコードしたもの」と見立てた命名で、decode が切り返し（世間→あなた）、encode が世間に託す（あなた→世間）。
+  API キー確認・入力検証・エラー処理は `lib/api.ts` の `createHandler` に共通化してあり、ルート側はどのメソッドを呼ぶかだけを書く。
 - `pages/api/line.ts` — LINE Webhook。`@line/bot-sdk` の `validateSignature` で `X-Line-Signature` を検証し、
   不正なリクエストは 401 で拒否する。署名検証に生ボディが必要なため `bodyParser: false`。
   1 回の Webhook に含まれる全イベントを処理し、テキスト以外のメッセージには定型文、OpenAI 失敗時はフォールバック文を返す。

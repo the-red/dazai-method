@@ -49,6 +49,15 @@ https://lin.ee/s8kHQfL2
 
 You should now be able to access the app at [http://localhost:3000](http://localhost:3000)!
 
+## Web API
+
+| エンドポイント | 太宰メソッド | 入力 | 出力 |
+| --- | --- | --- | --- |
+| `POST /api/decode` | `切り返す()` | 太宰メソッド（世間を主語にした発言） | 主語を本人に戻した切り返し |
+| `POST /api/encode` | `世間に託す()` | 一人称の本音 | 大きな主語に託した太宰メソッドの言い方 |
+
+リクエストは `{ "text": "..." }`、レスポンスは `{ "result": "..." }` または `{ "error": { "message": "..." } }`。
+
 ## LINE チャットボット（Webhook）
 
 Webhook は Next.js の API Route `pages/api/line.ts` で受けている。

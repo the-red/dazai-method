@@ -8,41 +8,65 @@ import { BeatLoader } from 'react-spinners'
 // 経路「太宰メソッドWeb経由の登録」の計測用 URL（分析 > 友だち > 追加経路 で集計される）
 const LINE_ADD_FRIEND_URL = 'https://lin.ee/xJvg0TV'
 
-// 入力欄のプレースホルダー候補（表示のたびにランダムで 1 つ選ぶ）
-const PLACEHOLDERS = [
-  'それは世間が、ゆるさない',
-  'そんな事をすると、世間からひどいめに逢うぞ',
-  'いまに世間から葬られる',
-]
+// 変換の向き。decode は太宰メソッドに切り返す（世間→あなた）、encode は本音を世間に託す（あなた→世間）
+type Mode = 'decode' | 'encode'
+
+// モードごとの表示と送信先。プレースホルダーは表示のたびにランダムで 1 つ選ぶ
+const MODES: Record<Mode, { label: string; endpoint: string; placeholders: string[] }> = {
+  decode: {
+    label: '世間じゃない',
+    endpoint: '/api/decode',
+    placeholders: ['それは世間が、ゆるさない', 'そんな事をすると、世間からひどいめに逢うぞ', 'いまに世間から葬られる'],
+  },
+  encode: {
+    label: '世間に託す',
+    endpoint: '/api/encode',
+    placeholders: ['私は、あの人が嫌いだ', '俺は、残業したくない', 'その服、似合ってないと思う'],
+  },
+}
+
+const pickPlaceholder = (mode: Mode) => {
+  const candidates = MODES[mode].placeholders
+  return candidates[Math.floor(Math.random() * candidates.length)]
+}
 
 export default function Home() {
   const inputElement = useRef<HTMLInputElement>(null)
+  const [mode, setMode] = useState<Mode>('decode')
   // サーバー側の HTML とブラウザ側の初回描画を一致させるため、乱数はマウント後に引く
   const [placeholder, setPlaceholder] = useState('')
   useEffect(() => {
-    setPlaceholder(PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)])
-  }, [])
+    setPlaceholder(pickPlaceholder(mode))
+  }, [mode])
   const [dazailInput, setDazaiInput] = useState('')
   const [result, setResult] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState(false)
+  // モードを切り替えたら前の結果は意味を失うので消す
+  const switchMode = (next: Mode) => {
+    if (next === mode) return
+    setMode(next)
+    setResult('')
+    setError('')
+    inputElement.current?.focus()
+  }
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault()
     // 空欄のまま送信されたら、表示中のプレースホルダーの文を入力とみなす
-    const dazai = dazailInput.trim() === '' ? placeholder : dazailInput
-    if (dazai === '') return
-    setDazaiInput(dazai)
+    const text = dazailInput.trim() === '' ? placeholder : dazailInput
+    if (text === '') return
+    setDazaiInput(text)
     try {
       inputElement.current?.select()
       setResult('')
       setError('')
       setLoading(true)
-      const response = await fetch('/api/generate', {
+      const response = await fetch(MODES[mode].endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ dazai }),
+        body: JSON.stringify({ text }),
       })
 
       const data = (await response.json()) as { result: string; error?: Error }
@@ -86,6 +110,21 @@ export default function Home() {
 
       <main className={styles.main}>
         <img src="/dazai.webp" alt="太宰メソッド" className={styles.hero} />
+        {/* 変換の向きの切り替え */}
+        <div className={styles.modes} role="tablist" aria-label="モード">
+          {(Object.keys(MODES) as Mode[]).map((key) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={mode === key}
+              className={mode === key ? styles.modeActive : undefined}
+              onClick={() => switchMode(key)}
+            >
+              {MODES[key].label}
+            </button>
+          ))}
+        </div>
         <form onSubmit={onSubmit}>
           <input
             ref={inputElement}
