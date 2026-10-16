@@ -69,6 +69,17 @@
   align-items: center;
   padding-top: 40px;
 }
+/* 右上の GitHub リンク */
+.github {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-block;
+  color: #353740;
+}
+.github:hover {
+  color: #10a37f;
+}
 
 /* スマホ用 */
 @media all and (max-width: 767.98px) {
