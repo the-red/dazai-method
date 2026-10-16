@@ -37,6 +37,10 @@ https://liff.line.me/1645278921-kWRPP32q/?accountId=020qdybb
    ```
 6. Add your [API key](https://platform.openai.com/account/api-keys) to the newly created `.env` file
 
+   LINE チャットボットも動かす場合は、LINE Developers コンソールの値も設定する
+   - `LINE_CHANNEL_SECRET`: チャネル基本設定 > チャネルシークレット
+   - `LINE_CHANNEL_ACCESS_TOKEN`: Messaging API 設定 > チャネルアクセストークン（長期）
+
 7. Run the app
 
    ```bash
@@ -44,3 +48,15 @@ https://liff.line.me/1645278921-kWRPP32q/?accountId=020qdybb
    ```
 
 You should now be able to access the app at [http://localhost:3000](http://localhost:3000)!
+
+## LINE チャットボット（Webhook）
+
+Webhook は Next.js の API Route `pages/api/line.ts` で受けている。
+Vercel にデプロイしたうえで、LINE Developers コンソールの Messaging API 設定で Webhook URL を次のように設定する。
+
+```
+https://dazai-method.vercel.app/api/line
+```
+
+Vercel の環境変数に `OPENAI_API_KEY`, `LINE_CHANNEL_SECRET`, `LINE_CHANNEL_ACCESS_TOKEN` を設定すること。
+`X-Line-Signature` による署名検証を行うため、LINE プラットフォーム以外からのリクエストは 401 で拒否される。
