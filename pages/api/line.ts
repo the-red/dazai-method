@@ -44,7 +44,7 @@ const buildReplyText = async (dazai: 太宰, message: webhook.MessageContent): P
     return dazai.道化る()
   }
   try {
-    return await dazai.切り返す(message.text)
+    return await dazai.decode(message.text)
   } catch (e) {
     console.error('Error with OpenAI API request:', e)
     return dazai.恥じる()

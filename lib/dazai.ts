@@ -11,7 +11,7 @@ const DEFAULT_PERSONA = '太宰治の小説「人間失格」の主人公'
 const NOT_DAZAI_METHOD = '太宰メソッドは使われていません。'
 
 // 太宰メソッドの例文と、それに対する主人公の切り返し、そして元になった本音。
-// 切り返す() は 例→切り返し、世間に託す() は 本音→例 の向きで few-shot に使う
+// decode() は 例→切り返し、encode() は 本音→例 の向きで few-shot に使う
 const EXAMPLES = [
   {
     本音: '私は、ゆるさない',
@@ -61,7 +61,7 @@ const buildPreamble = (persona: string) => `
 自分の責任は回避しつつ、発言に権威や説得力をもたせようとする手法を「太宰メソッド」と呼びます。
 `
 
-// 切り返す() のシステムプロンプト。行動指針（聞き流す文言を含む）はクラスが必ず付ける。
+// decode() のシステムプロンプト。行動指針（太宰メソッドでないときの定型文を含む）はクラスが必ず付ける。
 // ここまで差し替えられるようにすると、LINE 側の判定に使う定型文が崩れるため
 const buildDecodePrompt = (persona: string) => `${buildPreamble(persona)}
 太宰メソッドの例:
@@ -76,7 +76,7 @@ ${bulletList([...EXAMPLES.slice(0, 1).map((e) => e.太宰メソッド), ...EXTRA
 ${bulletList(EXAMPLES.map((e) => e.切り返し))}
 `
 
-// 世間に託す() のシステムプロンプト。本音を太宰メソッドの言い方に変換する
+// encode() のシステムプロンプト。本音を太宰メソッドの言い方に変換する
 const buildEncodePrompt = (persona: string) => `${buildPreamble(persona)}
 主人公の行動指針:
 * Userの発言は、Userの個人的な本音です。
@@ -113,19 +113,15 @@ export default class 太宰 {
     this.encodePrompt = buildEncodePrompt(人格)
   }
 
-  // 世間を主語にした発言を受け取り、主人公の切り返し（主語を本人に戻した問い返し）を得る。失敗時は例外を投げる
-  async 切り返す(seken: string): Promise<string> {
+  // 太宰メソッド（世間を主語にした発言）を受け取り、主語を本人に戻した主人公の切り返しを得る。
+  // 太宰メソッドでなければ NOT_DAZAI_METHOD の文言が返る。失敗時は例外を投げる
+  async decode(seken: string): Promise<string> {
     return this.complete(this.decodePrompt, seken)
   }
 
   // 一人称の本音を受け取り、大きな主語に託した太宰メソッドの言い方に変換する。失敗時は例外を投げる
-  async 世間に託す(本音: string): Promise<string> {
+  async encode(本音: string): Promise<string> {
     return this.complete(this.encodePrompt, 本音)
-  }
-
-  // 太宰メソッドが使われていない発言への定型返答
-  聞き流す(): string {
-    return NOT_DAZAI_METHOD
   }
 
   // スタンプや画像など、言葉以外を向けられたときの返答
@@ -136,11 +132,6 @@ export default class 太宰 {
   // 返答の生成に失敗したときの返答
   恥じる(): string {
     return '恥の多い生涯を送って来ました。返答の生成に失敗したのです。しばらくしてからもう一度お試しください。'
-  }
-
-  // プロンプトに載せている太宰メソッドの例文
-  例を挙げる(): string[] {
-    return [...EXAMPLES.map((e) => e.太宰メソッド), ...EXTRA_DAZAI_METHOD_EXAMPLES]
   }
 
   // システムプロンプトと発言を OpenAI に投げ、返答のテキストを返す
