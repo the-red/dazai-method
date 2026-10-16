@@ -5,11 +5,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "format": "prettier --write \"{pages,lib}/**/*.{js,ts,jsx,tsx,json}\""
+    "format": "prettier --write \"{pages,lib}/**/*.{js,ts,jsx,tsx,json}\"",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.server.json"
   },
   "dependencies": {
     "@line/bot-sdk": "^11.3.0",
     "@next/third-parties": "^16",
+    "hono": "^4.13.13",
     "next": "^16.4.0",
     "openai": "^7.32.0",
     "react": "^19.3.0",
@@ -20,9 +23,12 @@
     "node": "24.x"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261016.1",
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "prettier": "^3.9.10",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
   }
 }
