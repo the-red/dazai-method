@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { messagingApi, validateSignature, webhook } from '@line/bot-sdk'
-import dazai, { NOT_DAZAI_METHOD } from '../../lib/dazai'
+import 太宰 from '../../lib/dazai'
 
 // LINE Messaging API の Webhook エンドポイント
 // 署名検証のため生のリクエストボディが必要なので、Next.js の JSON パースを無効化する
@@ -9,9 +9,6 @@ export const config = {
   // OpenAI の応答待ちで Vercel の既定（10 秒）を超えることがあるため延長する
   maxDuration: 30,
 }
-
-// OpenAI 呼び出しに失敗したときに LINE へ返す文言
-const FALLBACK_REPLY = '返答の生成に失敗しました。しばらくしてからもう一度お試しください。'
 
 // LINE Developers コンソールの Webhook 検証で送られてくるダミーの replyToken
 const DUMMY_REPLY_TOKEN = '00000000000000000000000000000000'
@@ -41,16 +38,16 @@ const readRawBody = (req: NextApiRequest): Promise<Buffer> =>
   })
 
 // 受け取ったメッセージに対する返答文を決める
-const buildReplyText = async (message: webhook.MessageContent): Promise<string> => {
+const buildReplyText = async (dazai: 太宰, message: webhook.MessageContent): Promise<string> => {
   if (message.type !== 'text') {
     // スタンプや画像など、テキスト以外が送られてきた場合
-    return NOT_DAZAI_METHOD
+    return dazai.道化る()
   }
   try {
-    return await dazai.太宰(message.text)
+    return await dazai.切り返す(message.text)
   } catch (e) {
     console.error('Error with OpenAI API request:', e)
-    return FALLBACK_REPLY
+    return dazai.恥じる()
   }
 }
 
@@ -63,8 +60,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const channelSecret = process.env.LINE_CHANNEL_SECRET
   const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN
-  if (!channelSecret || !channelAccessToken) {
-    console.error('LINE_CHANNEL_SECRET / LINE_CHANNEL_ACCESS_TOKEN are not configured')
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!channelSecret || !channelAccessToken || !apiKey) {
+    console.error('LINE_CHANNEL_SECRET / LINE_CHANNEL_ACCESS_TOKEN / OPENAI_API_KEY are not configured')
     res.status(500).end()
     return
   }
@@ -105,12 +103,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const client = new messagingApi.MessagingApiClient({ channelAccessToken })
+  const dazai = new 太宰({ apiKey })
 
   // 1 回の Webhook に複数イベントが含まれることがあるので全件処理する
   await Promise.all(
     body.events.map(async (event) => {
       if (event.type !== 'message' || !event.replyToken || event.replyToken === DUMMY_REPLY_TOKEN) return
-      const text = await buildReplyText(event.message)
+      const text = await buildReplyText(dazai, event.message)
       try {
         await client.replyMessage({ replyToken: event.replyToken, messages: [{ type: 'text', text }] })
       } catch (e) {

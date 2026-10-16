@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import dazai from '../../lib/dazai'
+import 太宰 from '../../lib/dazai'
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  if (!process.env.OPENAI_API_KEY) {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
     res.status(500).json({
       error: {
         message: 'OpenAI API key not configured, please follow instructions in README.md',
@@ -22,7 +23,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const result = await dazai.太宰(seken)
+    const dazai = new 太宰({ apiKey })
+    const result = await dazai.切り返す(seken)
     res.status(200).json({ result })
   } catch (e) {
     const error = e as Error
