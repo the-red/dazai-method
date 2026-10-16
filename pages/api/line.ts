@@ -41,13 +41,13 @@ const readRawBody = (req: NextApiRequest): Promise<Buffer> =>
 const buildReplyText = async (dazai: 太宰, message: webhook.MessageContent): Promise<string> => {
   if (message.type !== 'text') {
     // スタンプや画像など、テキスト以外が送られてきた場合
-    return dazai.shrug()
+    return dazai.guide()
   }
   try {
     return await dazai.decode(message.text)
   } catch (e) {
     console.error('Error with OpenAI API request:', e)
-    return dazai.apologize()
+    return dazai.failed()
   }
 }
 

@@ -124,13 +124,13 @@ export default class 太宰 {
     return this.complete(this.encodePrompt, 本音)
   }
 
-  // スタンプや画像など、言葉以外を向けられたときの返答
-  shrug(): string {
+  // スタンプや画像など、言葉以外を向けられたときに、文章で送るよう案内する返答
+  guide(): string {
     return '言葉にしていただかないと、わたしには判りかねます。文章で聞かせてください。'
   }
 
   // 返答の生成に失敗したときの返答
-  apologize(): string {
+  failed(): string {
     return '恥の多い生涯を送って来ました。返答の生成に失敗したのです。しばらくしてからもう一度お試しください。'
   }
 
