@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@line/bot-sdk": "^11.3.0",
+    "@next/third-parties": "^16",
     "next": "^16.4.0",
     "openai": "^7.32.0",
     "react": "^19.3.0",
