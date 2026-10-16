@@ -2,7 +2,7 @@
 
 ## 運用環境
 ### Webアプリ（React + Hono / Cloudflare Workers）
-https://dazai-method.the-red.jp/
+https://dazai-method.the-red.app/
 
 ### LINEチャットボット
 https://lin.ee/s8kHQfL2
@@ -69,7 +69,7 @@ yarn preview     # ビルド成果物をローカルで確認
 Cloudflare の Workers Builds で GitHub リポジトリと連携しており、`main` ブランチへ push すると
 `yarn build` → `wrangler deploy` が自動で走る。手元から上げる場合は `yarn deploy`。
 
-Worker の設定（`wrangler.jsonc`）でカスタムドメイン `dazai-method.the-red.jp` を指定しているので、
+Worker の設定（`wrangler.jsonc`）でカスタムドメイン `dazai-method.the-red.app` を指定しているので、
 DNS レコードと証明書は初回デプロイ時に Cloudflare が自動で作る。`workers.dev` の既定 URL は無効化している。
 
 Cloudflare ダッシュボードの Worker 設定で次を登録する。
@@ -83,11 +83,11 @@ Webhook は Hono のハンドラ `src/server/line.ts` で受けている。
 LINE Developers コンソールの Messaging API 設定で Webhook URL を次のように設定する。
 
 ```
-https://dazai-method.the-red.jp/api/line
+https://dazai-method.the-red.app/api/line
 ```
 
 `X-Line-Signature` による署名検証を行うため、LINE プラットフォーム以外からのリクエストは 401 で拒否される。
-コンソールの「検証」が 4xx で失敗する場合は、`the-red.jp` ゾーンの WAF / Bot Fight Mode が LINE からの POST を
+コンソールの「検証」が 4xx で失敗する場合は、`the-red.app` ゾーンの WAF / Bot Fight Mode が LINE からの POST を
 弾いていないか確認する（必要なら `/api/*` のスキップルールを追加する）。
 
 ## アクセス解析（Google Analytics / Search Console）
@@ -109,7 +109,7 @@ GA4 の計測タグはコードではなく GTM 側で設定するので、GA �
 `index.html` の `<head>` に書いてデプロイする。
 （Workers の静的アセット配信は `.html` 付き URL をリダイレクトするため、HTML ファイル方式は使えない）
 
-1. Search Console で URL プレフィックス `https://dazai-method.the-red.jp/` のプロパティを追加する
+1. Search Console で URL プレフィックス `https://dazai-method.the-red.app/` のプロパティを追加する
 2. 表示された meta タグを `index.html` に追加してデプロイし、Search Console の「確認」を押す
 3. 左メニュー「サイトマップ」から `sitemap.xml` を送信する（`public/sitemap.xml`。`public/robots.txt` からも参照している）
 

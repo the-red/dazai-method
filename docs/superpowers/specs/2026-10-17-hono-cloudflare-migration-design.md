@@ -5,7 +5,7 @@
 ## 意図と背景
 
 Vercel の Hobby プランは広告掲載を商用利用とみなして禁止しているため、広告を出せる無料ホスティングへ移す。
-Cloudflare Workers の無料プランは規約に非商用・広告禁止の条項がなく、`the-red.jp` の DNS が既に Cloudflare 管理なので
+Cloudflare Workers の無料プランは規約に非商用・広告禁止の条項がなく、`the-red.app` の DNS が既に Cloudflare 管理なので
 カスタムドメインも追加コストなしで使える。
 
 このアプリは 1 ページ + API 3 本で、Next.js 固有の機能はほぼ使っていない。Next.js のまま Workers に載せると
@@ -14,7 +14,7 @@ OpenNext アダプタ、Worker サイズ上限、バージョン追従といっ�
 
 ## ゴール
 
-- `https://dazai-method.the-red.jp` で Web アプリが動き、`https://dazai-method.the-red.jp/api/line` で LINE Webhook が動く。
+- `https://dazai-method.the-red.app` で Web アプリが動き、`https://dazai-method.the-red.app/api/line` で LINE Webhook が動く。
 - `main` ブランチへ push すると Cloudflare 側で自動ビルド・自動デプロイされる（Vercel と同じ運用感）。
 - Web と LINE の振る舞い、API のリクエスト／レスポンス形式、画面の見た目と操作感は移行前と同じ。
 - OpenAI API キーと LINE のチャネルシークレット／アクセストークンは Worker の中だけに存在し、クライアントには届かない。
@@ -53,7 +53,7 @@ OpenNext アダプタ、Worker サイズ上限、バージョン追従といっ�
 | 行き先 | Cloudflare Workers 無料プラン |
 | サーバー側 | Hono で書き直し、Next.js は削除 |
 | 画面側 | React のまま。Vite でビルドして静的アセットとして配信 |
-| 本番 URL | `https://dazai-method.the-red.jp`（カスタムドメイン。`the-red.jp` のゾーンは Worker と同じ Cloudflare アカウントで DNS 管理済み。同名の既存 DNS レコードはない） |
+| 本番 URL | `https://dazai-method.the-red.app`（カスタムドメイン。`the-red.app` のゾーンは Worker と同じ Cloudflare アカウントで DNS 管理済み。同名の既存 DNS レコードはない） |
 | デプロイ | GitHub 連携で push 時に自動（Workers Builds） |
 | 旧 URL | 切り替えと同時に Vercel プロジェクトを削除。転送なし |
 | 作業ブランチ | `v2` のまま進める。移行コミットは `v2` に積み、encode / decode と移行をまとめて `main` に入れる。`v2` 単体を Vercel でリリースする工程は設けない |
@@ -120,7 +120,7 @@ vite.config.ts              Vite + React プラグイン + Cloudflare Vite プ�
 - `assets`: Vite の出力先を静的アセットとして配信する。リクエストがアセットに一致すればアセットが返り、
   一致しなければ Worker に渡る（既定の挙動）。`/api/*` にはアセットがないので Worker に届く。
 - `workers_dev`: `false`（`workers.dev` の既定 URL を無効化）
-- `routes`: `dazai-method.the-red.jp` をカスタムドメインとして指定（`custom_domain: true`）。
+- `routes`: `dazai-method.the-red.app` をカスタムドメインとして指定（`custom_domain: true`）。
   DNS レコードと証明書は Cloudflare が自動で作る。
 - `observability` のログは有効にする（無料枠内）。
 
@@ -190,19 +190,19 @@ vitest を入れて `src/server` の API 契約だけ検証する。対象は次
 3. 移行ブランチをデプロイし、Workers Builds のプレビュー URL で画面と `/api/decode` を確認する。
    （プレビュー URL は `workers.dev` 配下に出る。本番は `workers_dev: false` でも、プレビューには影響しない。
    もし出なければ一時的に `workers_dev: true` にして確認し、確認後に戻す。）
-4. `main` にマージして本番デプロイ。`https://dazai-method.the-red.jp` で画面と API を確認する。
-5. LINE Developers コンソールの Webhook URL を `https://dazai-method.the-red.jp/api/line` に変え、「検証」ボタンで 200 を確認。
+4. `main` にマージして本番デプロイ。`https://dazai-method.the-red.app` で画面と API を確認する。
+5. LINE Developers コンソールの Webhook URL を `https://dazai-method.the-red.app/api/line` に変え、「検証」ボタンで 200 を確認。
    実際にトークで 1 往復して返信を確認する。
-6. Search Console で `https://dazai-method.the-red.jp/` の URL プレフィックス型プロパティを追加し、
+6. Search Console で `https://dazai-method.the-red.app/` の URL プレフィックス型プロパティを追加し、
    HTML タグ方式で所有権を確認する。サイトマップを再送信する。
 7. Vercel のプロジェクトを削除する。
 8. GTM のトリガーや GA4 のデータストリームにホスト名条件があれば新ホスト名に変える（利用者が確認する）。
 
 手順 1、2、5、6、7、8 はダッシュボード操作なので利用者が行う。コードと設定ファイルは実装者が用意する。
 
-手順 5 で LINE の「検証」が 4xx やチャレンジ応答で失敗した場合は、`the-red.jp` ゾーンの Bot Fight Mode や
+手順 5 で LINE の「検証」が 4xx やチャレンジ応答で失敗した場合は、`the-red.app` ゾーンの Bot Fight Mode や
 WAF マネージドルールが LINE プラットフォームからの POST を署名検証より手前で弾いている可能性がある。
-その場合は `dazai-method.the-red.jp/api/*` を対象にした WAF のスキップルールをゾーン側に追加する（利用者のダッシュボード操作）。
+その場合は `dazai-method.the-red.app/api/*` を対象にした WAF のスキップルールをゾーン側に追加する（利用者のダッシュボード操作）。
 Vercel にはなかった層なので、切り替え時に意識しておく。
 
 ### Search Console の確認方式を HTML タグ方式に変える（私の判断）

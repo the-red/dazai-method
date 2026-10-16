@@ -8,7 +8,7 @@
   "upload_source_maps": true,
   // 公開 URL はカスタムドメインだけにし、workers.dev の既定 URL は無効化する
   "workers_dev": false,
-  "routes": [{ "pattern": "dazai-method.the-red.jp", "custom_domain": true }],
+  "routes": [{ "pattern": "dazai-method.the-red.app", "custom_domain": true }],
   "observability": { "enabled": true },
   "assets": {
     // directory は Vite プラグインがビルド時に client の出力先を埋める。

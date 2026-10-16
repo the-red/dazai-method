@@ -216,7 +216,7 @@ yarn add -D vite @vitejs/plugin-react @cloudflare/vite-plugin wrangler @types/re
 - `"compatibility_flags": ["nodejs_compat"]`
 - `"upload_source_maps": true`
 - `"workers_dev": false`
-- `"routes": [{ "pattern": "dazai-method.the-red.jp", "custom_domain": true }]`
+- `"routes": [{ "pattern": "dazai-method.the-red.app", "custom_domain": true }]`
 - `"observability": { "enabled": true }`
 - `"assets": { "run_worker_first": ["/api/*"] }`（`directory` は Vite プラグインが出力時に埋める。`not_found_handling` は既定のままにし、アセットに無いパスは Worker に渡して Hono が 404 を返す）
 
@@ -273,7 +273,7 @@ git commit -m "feat: Next.js をやめ、Vite + React の画面と Hono の Work
 ### Task 4: 公開 URL とドキュメントを新構成に合わせる
 
 **Files:**
-- Modify: `public/sitemap.xml`、`public/robots.txt`（`https://dazai-method.vercel.app/` を `https://dazai-method.the-red.jp/` に）
+- Modify: `public/sitemap.xml`、`public/robots.txt`（`https://dazai-method.vercel.app/` を `https://dazai-method.the-red.app/` に）
 - Modify: `README.md`
 - Modify: `CLAUDE.md`
 
@@ -313,6 +313,6 @@ git commit -m "docs: 公開 URL と README / CLAUDE.md を Cloudflare Workers �
 1. Cloudflare ダッシュボードで Workers Builds から `the-red/dazai-method` を接続。本番ブランチ `main`、ビルドコマンド `yarn build`、デプロイコマンド `yarn wrangler deploy`。
 2. Worker の Settings > Variables & Secrets にシークレット 3 つ、Build variables に `VITE_GTM_ID`。
 3. `v2` のプレビューで画面と `/api/decode` を確認し、`main` にマージして本番デプロイ。
-4. LINE Developers の Webhook URL を `https://dazai-method.the-red.jp/api/line` に変更し「検証」。失敗したらゾーンの WAF / Bot Fight Mode のスキップルールを疑う。
+4. LINE Developers の Webhook URL を `https://dazai-method.the-red.app/api/line` に変更し「検証」。失敗したらゾーンの WAF / Bot Fight Mode のスキップルールを疑う。
 5. Search Console で新プロパティを作り、表示された `content` 値を `index.html` の meta タグに書いてデプロイし「確認」。サイトマップ再送信。
 6. Vercel プロジェクトを削除。

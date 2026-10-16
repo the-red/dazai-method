@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 『人間失格』の主人公として「世間じゃない。あなたが〜でしょう？」と切り返す OpenAI チャットボット。
 同じプロンプトで 2 つの配信形態がある。
 
-- **Web アプリ**: React（Vite）の単一ページ + Hono の API。Cloudflare Workers にデプロイ（https://dazai-method.the-red.jp/）。
+- **Web アプリ**: React（Vite）の単一ページ + Hono の API。Cloudflare Workers にデプロイ（https://dazai-method.the-red.app/）。
   「世間じゃない」（太宰メソッドに切り返す）と「世間に託す」（本音を太宰メソッドに変換する）の 2 モード
 - **LINE チャットボット**: 同じ Worker の `/api/line` が LINE Messaging API の Webhook として動作
 
@@ -81,7 +81,7 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
 - `vite.config.ts` で `@vitejs/plugin-react` と `@cloudflare/vite-plugin` を使い、画面と Worker を 1 つの Vite プロジェクトで扱う。
   `yarn build` で `dist/client`（静的アセット）と `dist/worker`（Worker 本体と出力用 `wrangler.json`）ができる。
 - `wrangler.jsonc` が Worker の設定。`workers_dev: false` で既定 URL を無効化し、`routes` のカスタムドメイン
-  `dazai-method.the-red.jp` だけで公開する。`assets.run_worker_first: ["/api/*"]` で API は常に Worker に渡す。
+  `dazai-method.the-red.app` だけで公開する。`assets.run_worker_first: ["/api/*"]` で API は常に Worker に渡す。
 - `compatibility_date` はインストール済み wrangler（workerd）が対応する日付までしか指定できない。wrangler を上げたら進める。
 - デプロイは Cloudflare の Workers Builds（GitHub 連携）。`main` への push で `yarn build` → `wrangler deploy` が走る。
 
@@ -95,11 +95,11 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
 - Cloudflare の Worker 設定 > Variables & Secrets に `OPENAI_API_KEY`, `LINE_CHANNEL_SECRET`, `LINE_CHANNEL_ACCESS_TOKEN` を、
   Build > Build variables に `VITE_GTM_ID`（GTM コンテナ ID。画面のバンドルに埋め込まれる）を設定している。
   GA4 の測定 ID は GTM 内にあり、コードには登場しない。
-- `the-red.jp` のゾーンは Worker と同じ Cloudflare アカウントで DNS 管理している。カスタムドメインの DNS レコードと証明書は
+- `the-red.app` のゾーンは Worker と同じ Cloudflare アカウントで DNS 管理している。カスタムドメインの DNS レコードと証明書は
   `wrangler deploy` が自動で作る。
-- Google Search Console は `https://dazai-method.the-red.jp/` を URL プレフィックスで登録し、HTML タグ方式（`index.html` の meta タグ）で所有権確認する。
+- Google Search Console は `https://dazai-method.the-red.app/` を URL プレフィックスで登録し、HTML タグ方式（`index.html` の meta タグ）で所有権確認する。
   Workers の静的アセット配信は `.html` 付き URL をリダイレクトするので、HTML ファイル方式は使えない。
-- LINE Developers コンソールの Webhook URL は `https://dazai-method.the-red.jp/api/line`。
+- LINE Developers コンソールの Webhook URL は `https://dazai-method.the-red.app/api/line`。
   LINE の「検証」が 4xx で失敗する場合は、ゾーンの WAF / Bot Fight Mode が LINE からの POST を弾いていないか疑う。
 - 2026-10 に Vercel（Next.js）から Cloudflare Workers（Hono + Vite）へ移行した。Vercel のプロジェクトは削除済み。
   移行の経緯と設計は `docs/superpowers/specs/2026-10-17-hono-cloudflare-migration-design.md` にある。
