@@ -2,18 +2,17 @@
   "name": "dazai-method",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "format": "prettier --write \"{pages,lib}/**/*.{js,ts,jsx,tsx,json}\"",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "yarn build && wrangler deploy",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.server.json"
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.server.json",
+    "format": "prettier --write index.html src lib"
   },
   "dependencies": {
     "@line/bot-sdk": "^11.3.0",
-    "@next/third-parties": "^16",
     "hono": "^4.13.13",
-    "next": "^16.4.0",
     "openai": "^7.32.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -23,12 +22,17 @@
     "node": "24.x"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.64.0",
     "@cloudflare/workers-types": "^5.20261016.1",
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "prettier": "^3.9.10",
     "typescript": "7.0.2",
     "vite": "^8.3.4",
-    "vitest": "^5.0.5"
-  }
+    "vitest": "^5.0.5",
+    "wrangler": "^4.151.1"
+  },
+  "type": "module"
 }

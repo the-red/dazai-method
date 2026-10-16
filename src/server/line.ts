@@ -7,9 +7,6 @@ import type { AppEnv } from './bindings'
 // LINE Developers コンソールの Webhook 検証で送られてくるダミーの replyToken
 const DUMMY_REPLY_TOKEN = '00000000000000000000000000000000'
 
-// 受け付けるリクエストボディの上限。LINE の Webhook はテキスト中心で数 KB 程度なので十分余裕がある
-const MAX_BODY_BYTES = 1024 * 1024
-
 // 受け取ったメッセージに対する返答文を決める
 const buildReplyText = async (dazai: 太宰, message: webhook.MessageContent): Promise<string> => {
   if (message.type !== 'text') {
@@ -47,15 +44,8 @@ export const handleLineWebhook: Handler<AppEnv> = async (c) => {
     return c.body(null, 401)
   }
 
-  // Content-Length が上限を超えていれば読み始める前に拒否する。
-  // ヘッダーが無い場合に備え、読み終えた後にも実サイズで確認する
-  if (Number(c.req.header('content-length')) > MAX_BODY_BYTES) {
-    return c.body(null, 413)
-  }
+  // ボディの上限は index.ts の bodyLimit ミドルウェアが見ている。ここでは署名検証のため生のバイト列をそのまま読む
   const rawBody = Buffer.from(await c.req.arrayBuffer())
-  if (rawBody.byteLength > MAX_BODY_BYTES) {
-    return c.body(null, 413)
-  }
 
   // 署名を検証し、LINE プラットフォーム以外からのリクエストを拒否する
   if (!validateSignature(rawBody, channelSecret, signature)) {

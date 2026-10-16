@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import { FormEventHandler, useEffect, useRef, useState } from 'react'
 import styles from './index.module.css'
 import { BeatLoader } from 'react-spinners'
@@ -30,10 +29,10 @@ const pickPlaceholder = (mode: Mode) => {
   return candidates[Math.floor(Math.random() * candidates.length)]
 }
 
-export default function Home() {
+export default function App() {
   const inputElement = useRef<HTMLInputElement>(null)
   const [mode, setMode] = useState<Mode>('decode')
-  // サーバー側の HTML とブラウザ側の初回描画を一致させるため、乱数はマウント後に引く
+  // 乱数はマウント後に引く（SSR 時代の名残だが、動作は同じなのでそのまま）
   const [placeholder, setPlaceholder] = useState('')
   useEffect(() => {
     setPlaceholder(pickPlaceholder(mode))
@@ -87,11 +86,6 @@ export default function Home() {
 
   return (
     <div>
-      <Head>
-        <title>太宰メソッド</title>
-        <link rel="icon" href="/seken.png" />
-      </Head>
-
       {/* 右上の外部リンク */}
       <nav className={styles.links}>
         <a href={LINE_ADD_FRIEND_URL} target="_blank" rel="noreferrer" aria-label="LINE チャットボットを友だち追加">

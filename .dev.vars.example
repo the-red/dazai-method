@@ -1,0 +1,14 @@
+# ローカル開発用のシークレット。このファイルを .dev.vars にコピーして値を入れる（.dev.vars は git 管理外）。
+# 本番は Cloudflare ダッシュボードの Worker 設定 > Variables & Secrets に同じ名前で登録する
+
+# Do not share your OpenAI API key with anyone! It should remain a secret.
+OPENAI_API_KEY=
+
+# LINE Messaging API（LINE Developers コンソール > チャネル基本設定 / Messaging API 設定）
+# Webhook の署名検証とメッセージ返信に使う。LINE Bot を動かさない場合は空のままでよい
+LINE_CHANNEL_SECRET=
+LINE_CHANNEL_ACCESS_TOKEN=
+
+# Google タグマネージャーのコンテナ ID（VITE_GTM_ID）はここではなく、
+# Cloudflare ダッシュボードの Worker 設定 > Build > Build variables で設定する（画面のバンドルに埋め込まれる）。
+# ローカルでは設定しない。開発中の操作が本番の計測に混ざらないようにするため

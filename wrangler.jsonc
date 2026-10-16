@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "dazai-method",
+  "main": "./src/server/index.ts",
+  "compatibility_date": "2026-10-12",
+  // @line/bot-sdk の署名検証が node:crypto を使うので Node 互換を有効にする
+  "compatibility_flags": ["nodejs_compat"],
+  "upload_source_maps": true,
+  // 公開 URL はカスタムドメインだけにし、workers.dev の既定 URL は無効化する
+  "workers_dev": false,
+  "routes": [{ "pattern": "dazai-method.the-red.jp", "custom_domain": true }],
+  "observability": { "enabled": true },
+  "assets": {
+    // directory は Vite プラグインがビルド時に client の出力先を埋める。
+    // /api/* は静的アセットを探さず常に Worker に渡す。それ以外でアセットに無いパスは Worker（Hono）が 404 を返す
+    "run_worker_first": ["/api/*"]
+  }
+}

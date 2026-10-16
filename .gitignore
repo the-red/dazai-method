@@ -8,11 +8,9 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
-# next dev / next build のたびに中身が変わる自動生成ファイル（Next が再生成する）
-next-env.d.ts
+# vite / wrangler
+/dist/
+/.wrangler/
 
 # production
 /build
@@ -26,6 +24,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # env files
+# ローカル開発用のシークレット（.dev.vars.example をコピーして作る）
+.dev.vars
 .env
 .env.local
 .env.development.local
