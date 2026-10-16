@@ -82,6 +82,10 @@
 
 /* スマホ用 */
 @media all and (max-width: 767.98px) {
+  /* 右上のアイコン（top 16px + 32px）と画像が詰まって見えないよう、全体を下げる */
+  .main {
+    padding-top: 96px;
+  }
   .main .hero {
     width: 320px;
   }
