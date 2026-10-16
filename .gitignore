@@ -11,6 +11,8 @@
 # next.js
 /.next/
 /out/
+# next dev / next build のたびに中身が変わる自動生成ファイル（Next が再生成する）
+next-env.d.ts
 
 # production
 /build
