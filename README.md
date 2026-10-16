@@ -5,7 +5,7 @@
 https://dazai-method.vercel.app/
 
 ### LINEチャットボット
-https://liff.line.me/1645278921-kWRPP32q/?accountId=020qdybb
+https://lin.ee/s8kHQfL2
 
 ## Setup
 
