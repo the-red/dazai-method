@@ -8,25 +8,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 『人間失格』の主人公として「世間じゃない。あなたが〜でしょう？」と切り返す OpenAI チャットボット。
 同じプロンプトで 2 つの配信形態がある。
 
-- **Web アプリ**: Next.js（Pages Router）。Vercel にデプロイ（https://dazai-method.vercel.app/）。
+- **Web アプリ**: React（Vite）の単一ページ + Hono の API。Cloudflare Workers にデプロイ（https://dazai-method.the-red.jp/）。
   「世間じゃない」（太宰メソッドに切り返す）と「世間に託す」（本音を太宰メソッドに変換する）の 2 モード
-- **LINE チャットボット**: 同じ Next.js の API Route（`pages/api/line.ts`）が LINE Messaging API の Webhook として動作
+- **LINE チャットボット**: 同じ Worker の `/api/line` が LINE Messaging API の Webhook として動作
 
 ## コマンド
 
-パッケージマネージャは yarn。Node は `.tool-versions`（mise 管理、メジャーバージョン 24 のみ指定）に従う。
+パッケージマネージャは yarn 1。Node は `.tool-versions`（mise 管理）と `.node-version`（Workers Builds 用）の 24 系に従う。
 
 ```bash
 yarn install        # 依存インストール
-yarn dev            # 開発サーバー起動（http://localhost:3000）
-yarn build          # 本番ビルド
-yarn start          # 本番サーバー起動
-yarn format         # Prettier で pages/ と lib/ 配下を整形
+yarn dev            # 開発サーバー起動（http://localhost:5173。画面と API が同時に立ち上がる）
+yarn build          # 本番ビルド（dist/client に静的アセット、dist/worker に Worker と wrangler.json）
+yarn preview        # ビルド成果物をローカルで確認
+yarn deploy         # ビルドして wrangler deploy（通常は push で自動デプロイされるので手動時のみ）
+yarn test           # vitest（src/server のテスト）
+yarn typecheck      # tsc（クライアントとサーバーを別の tsconfig で検査。ビルドには含まれない）
+yarn format         # Prettier で index.html, src/, lib/ を整形
 ```
 
-テスト・lint の仕組みは存在しない。型チェックは `yarn build` に含まれる（`tsconfig.json` は strict）。
+lint の仕組みは存在しない。型チェックは `yarn build` に含まれないので、変更後は `yarn typecheck` と `yarn test` を別に実行する。
 
-ローカル実行には `.env` に `OPENAI_API_KEY` が必要（`.env.example` をコピーして設定）。
+ローカル実行には `.dev.vars` に `OPENAI_API_KEY` が必要（`.dev.vars.example` をコピーして設定）。
 LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCESS_TOKEN` も必要。
 
 ## アーキテクチャ
@@ -43,36 +46,63 @@ LINE Webhook を動かす場合は `LINE_CHANNEL_SECRET` と `LINE_CHANNEL_ACCES
   `guide()`（テキスト以外を受けたときに文章で送るよう案内する定型文）、`failed()`（LLM 失敗時のフォールバック文）。
   メソッド名は英語で、decode / encode / guide / failed のように語尾を -de か -ed にそろえる。
   使われていないメソッドは置かない。
-- OpenAI の API キーはコンストラクタの必須引数。クラスの中で `process.env` は読まず、API Route 側が環境変数を確認してから渡す。
+- OpenAI の API キーはコンストラクタの必須引数。クラスの中で環境変数は読まず、ハンドラ側が `c.env` を確認してから渡す。
   人格（ロールプレイする人物）とモデルは省略可能オプションで差し替えられる。
   生成後に変えられる setter は意図的に設けない（共有インスタンスの振る舞いが途中で変わるのを防ぐ）。
   差し替えられるのは人格の一文だけで、前提知識・例文・行動指針（太宰メソッドでないときの定型文を含む）はクラスが必ずプロンプトに付ける。
 
-### Next.js 側（`pages/`）
+### サーバー側（`src/server/`、Hono）
 
-- `pages/index.tsx` — 単一ページの UI。モード切り替え（decode / encode）に応じて `/api/decode` または `/api/encode` に
-  `{ text: string }` を POST し、`{ result }` または `{ error: { message } }` を受け取って表示する。
-- `pages/api/decode.ts` / `pages/api/encode.ts` — Web 用 API Route。それぞれ `太宰.decode()` / `太宰.encode()` を 1 対 1 で公開する。
+- `index.ts` — Worker のエントリ。`Hono` アプリにルートを登録し default export する。
+  静的アセットに一致しなかったリクエストだけがここに届き、未知のパスは Hono の既定で 404。
+  `/api/decode` と `/api/encode` には 1MiB の `bodyLimit`（413 JSON）、`/api/line` にも 1MiB の `bodyLimit`（413 空ボディ）を前置している。
+- `api.ts` — `createHandler(invoke)`。API キー確認・入力検証（`{ text: string }`）・エラー処理を共通化し、
+  ルート側はどの太宰メソッドを呼ぶかだけを書く。レスポンスは `{ result }` または `{ error: { message } }`。
   太宰メソッドを「本音を世間語にエンコードしたもの」と見立てた命名で、decode が切り返し（世間→あなた）、encode が世間に託す（あなた→世間）。
-  API キー確認・入力検証・エラー処理は `lib/api.ts` の `createHandler` に共通化してあり、ルート側はどのメソッドを呼ぶかだけを書く。
-- `pages/api/line.ts` — LINE Webhook。`@line/bot-sdk` の `validateSignature` で `X-Line-Signature` を検証し、
-  不正なリクエストは 401 で拒否する。署名検証に生ボディが必要なため `bodyParser: false`。
+- `line.ts` — `handleLineWebhook`。`@line/bot-sdk` の `validateSignature` で `X-Line-Signature` を検証し、
+  不正なリクエストは 401 で拒否する。署名検証に生ボディが必要なので `c.req.arrayBuffer()` で読む。
+  `validateSignature` が `node:crypto` を使うため `wrangler.jsonc` で `nodejs_compat` を有効にしている。
   1 回の Webhook に含まれる全イベントを処理し、テキスト以外のメッセージには定型文、OpenAI 失敗時はフォールバック文を返す。
-- `pages/_app.tsx` — 全ページ共通のラッパー。環境変数 `NEXT_PUBLIC_GTM_ID` があるときだけ
-  `@next/third-parties/google` の `GoogleTagManager` を埋め込む。GA4 の計測タグは GTM 側で設定している。
-- `pages/index.module.css` — スタイルは CSS Modules のみ。
+  POST 以外は 405 を返す（`app.all` で受けてハンドラ内で判定）。
+- `bindings.ts` — Worker のシークレットの型 `Bindings` と Hono 用の `AppEnv`。シークレットは `process.env` ではなく `c.env` から読む。
+- テストは `*.test.ts`（vitest、Node 上で `app.request()` を直接呼ぶ）。`太宰` と LINE の返信クライアントはモックし、署名検証は本物を使う。
+
+### 画面側（`src/client/`、React + Vite）
+
+- `App.tsx` — 単一ページの UI。モード切り替え（decode / encode）に応じて `/api/decode` または `/api/encode` に
+  `{ text: string }` を POST し、`{ result }` または `{ error: { message } }` を受け取って表示する。
+- `main.tsx` — React のマウント。先に `installGtm(import.meta.env.VITE_GTM_ID)` を呼ぶ。
+- `gtm.ts` — Google タグマネージャーのスニペットを挿入する。コンテナ ID が無ければ何もしない。GA4 の計測タグは GTM 側で設定している。
+- `index.module.css` — スタイルは CSS Modules のみ。
+- `index.html`（リポジトリ直下）が Vite のエントリ。`<title>`、favicon、Search Console の確認用 meta タグはここに書く。
+
+### ビルドとデプロイ
+
+- `vite.config.ts` で `@vitejs/plugin-react` と `@cloudflare/vite-plugin` を使い、画面と Worker を 1 つの Vite プロジェクトで扱う。
+  `yarn build` で `dist/client`（静的アセット）と `dist/worker`（Worker 本体と出力用 `wrangler.json`）ができる。
+- `wrangler.jsonc` が Worker の設定。`workers_dev: false` で既定 URL を無効化し、`routes` のカスタムドメイン
+  `dazai-method.the-red.jp` だけで公開する。`assets.run_worker_first: ["/api/*"]` で API は常に Worker に渡す。
+- `compatibility_date` はインストール済み wrangler（workerd）が対応する日付までしか指定できない。wrangler を上げたら進める。
+- デプロイは Cloudflare の Workers Builds（GitHub 連携）。`main` への push で `yarn build` → `wrangler deploy` が走る。
 
 ### 静的ファイル（`public/`）
 
 - `robots.txt` / `sitemap.xml` — Search Console 用。`/api/` 配下はクロール対象外。
-- `google8375f6c0c9e2d40f.html` — Search Console の所有権確認用（HTML ファイル方式）。削除すると確認が外れる。
+- `dazai.webp` / `seken.png` — 画面の画像と favicon。
 
 ### 運用上の前提
 
-- Vercel の環境変数に `OPENAI_API_KEY`, `LINE_CHANNEL_SECRET`, `LINE_CHANNEL_ACCESS_TOKEN`,
-  `NEXT_PUBLIC_GTM_ID`（GTM コンテナ ID）を設定している。GA4 の測定 ID は GTM 内にあり、コードには登場しない。
-- Google Search Console は `https://dazai-method.vercel.app/` を URL プレフィックスで登録し、HTML ファイル方式で所有権確認している。
-- LINE Developers コンソールの Webhook URL は `https://dazai-method.vercel.app/api/line`。
+- Cloudflare の Worker 設定 > Variables & Secrets に `OPENAI_API_KEY`, `LINE_CHANNEL_SECRET`, `LINE_CHANNEL_ACCESS_TOKEN` を、
+  Build > Build variables に `VITE_GTM_ID`（GTM コンテナ ID。画面のバンドルに埋め込まれる）を設定している。
+  GA4 の測定 ID は GTM 内にあり、コードには登場しない。
+- `the-red.jp` のゾーンは Worker と同じ Cloudflare アカウントで DNS 管理している。カスタムドメインの DNS レコードと証明書は
+  `wrangler deploy` が自動で作る。
+- Google Search Console は `https://dazai-method.the-red.jp/` を URL プレフィックスで登録し、HTML タグ方式（`index.html` の meta タグ）で所有権確認する。
+  Workers の静的アセット配信は `.html` 付き URL をリダイレクトするので、HTML ファイル方式は使えない。
+- LINE Developers コンソールの Webhook URL は `https://dazai-method.the-red.jp/api/line`。
+  LINE の「検証」が 4xx で失敗する場合は、ゾーンの WAF / Bot Fight Mode が LINE からの POST を弾いていないか疑う。
+- 2026-10 に Vercel（Next.js）から Cloudflare Workers（Hono + Vite）へ移行した。Vercel のプロジェクトは削除済み。
+  移行の経緯と設計は `docs/superpowers/specs/2026-10-17-hono-cloudflare-migration-design.md` にある。
 - 2026-10 まで LINE Webhook は Google Apps Script で動いていたが、署名検証ができないため Vercel に移行し、GAS 実装は削除済み。
 
 ## コードスタイル

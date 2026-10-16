@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://dazai-method.vercel.app/sitemap.xml
+Sitemap: https://dazai-method.the-red.jp/sitemap.xml
